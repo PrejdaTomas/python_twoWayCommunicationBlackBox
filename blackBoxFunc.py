@@ -5,7 +5,7 @@ from AA_dependencies import os
 from AA_dependencies import random
 from AA_dependencies import pidPrint
 from AA_dependencies import sleep, perf_counter
-from AA_dependencies import AC_decorators
+from AA_dependencies import AD_decorators
 
 from main import constants
 
@@ -13,8 +13,8 @@ T = typing.TypeVar("T", str,None)
 
 
 
-@AC_decorators.checkTypesAtCorrespondingIndices(inputTypes=(Path,), argumentPositions=(0,))
-@AC_decorators.verboser
+@AD_decorators.checkTypesAtCorrespondingIndices(inputTypes=(Path,), argumentPositions=(0,))
+@AD_decorators.verboser
 def writeSomething(targetPath: Path) -> None:
 	t0 = perf_counter()
 
@@ -34,15 +34,16 @@ def writeSomething(targetPath: Path) -> None:
 			post		= post.ljust(6, "0")
 		
 			now 		= ".".join((pre, post))
-			consoleOutpt= f"---> {str(iterNumber).zfill(5)}:\t{now} s"
-
-			if (iterNumber % 25 == 0): pidPrint(consoleOutpt)
-
 			genNumber	= f"+{str(genNumber).rjust(3, '0')}" if positive else f"-{str(genNumber)[1:].rjust(3, '0')}"
+
+			consoleOutpt= f"---> {str(iterNumber).zfill(5)}:\t{now} s\t{genNumber}"
+
+			pidPrint(consoleOutpt)
+
 
 			writePort.write(f"{now}\t{genNumber}\n")
 			writePort.flush()
-			sleep(0.1)
+			sleep(0.025)
 			iterNumber += 1
 		pidPrint(f"writeSomething: trying to close a writePort to {targetPath}")
 	pidPrint(f"writeSomething: writePort to {targetPath} is closed!")
