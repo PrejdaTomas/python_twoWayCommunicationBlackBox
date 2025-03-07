@@ -2,6 +2,7 @@ import typing, types
 import os
 import logging
 import logging.config as loggingConfig
+import logging.handlers as loggingHandlers
 
 import functools
 import random
@@ -13,7 +14,7 @@ from time import sleep, perf_counter
 # import watchdog.events as watchdogEvents
 # import watchdog.observers as watchdogObservers
 import subprocess, threading, multiprocessing, psutil, signal
-
+import itertools
 
 class Singleton:
 	__instance: typing.Self = None
@@ -120,7 +121,11 @@ def pidPrint(*args: typing.Optional[str], sep: typing.Optional[str] = " ", end: 
 		print(returnVal, sep=sep, end=end, flush=True)
 	return returnVal
 
+import random
+formattedNum = lambda genNumber: f"+{str(genNumber).rjust(3, '0')}" if genNumber >= 0 else f"-{str(genNumber)[1:].rjust(3, '0')}"
+
+
 import AB_logging
 import AC_signals
-import AD_decorators
 import AE_IO
+import AD_decorators

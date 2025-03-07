@@ -5,6 +5,8 @@ from AA_dependencies import threading
 from AA_dependencies import psutil
 from AA_dependencies import Path
 from AA_dependencies import sleep
+from AA_dependencies import formattedNum
+from AA_dependencies import random
 
 from AA_dependencies import AB_logging
 from AA_dependencies import AD_decorators
@@ -74,3 +76,25 @@ def runner(	command:					str,
 
 	proc.terminate()
 	return PID, proc, stdout_thread, stderr_thread, outfile_thread, timer_thread
+
+
+@AD_decorators.verboser
+def runner(	command:					str,
+			shell:						typing.Optional[bool]	= False,
+			stdin:						typing.Optional[int]	= subprocess.PIPE,
+			stderr:						typing.Optional[int]	= subprocess.PIPE,
+			stdout:						typing.Optional[int]	= subprocess.PIPE,
+			currentWorkDir:				typing.Optional[Path]	= Path(value=os.getcwd()),
+			text: 						typing.Optional[bool]	= True
+	) -> subprocess.Popen:
+	proc: subprocess.Popen			= subprocess.Popen(	command if shell else command.split(),
+														stdin=	stdin,
+														stdout=	stdout,
+														stderr=	stderr,
+														shell=	shell,
+														cwd=	currentWorkDir,
+														text=	text,
+	)
+
+	return proc
+

@@ -16,6 +16,7 @@ T = typing.TypeVar("T", str,None)
 @AD_decorators.checkTypesAtCorrespondingIndices(inputTypes=(Path,), argumentPositions=(0,))
 @AD_decorators.verboser
 def writeSomething(targetPath: Path) -> None:
+	if targetPath in (None, "None"): targetPath = "outptt"
 	t0 = perf_counter()
 
 	pidPrint(f"writeSomething: trying to delete the output file {targetPath} from the last run")
@@ -45,6 +46,7 @@ def writeSomething(targetPath: Path) -> None:
 			writePort.flush()
 			sleep(0.025)
 			iterNumber += 1
+		writePort.write(f"TERMINATED FROM AN OUTSIDE THREAD\n")
 		pidPrint(f"writeSomething: trying to close a writePort to {targetPath}")
 	pidPrint(f"writeSomething: writePort to {targetPath} is closed!")
 	return

@@ -7,8 +7,8 @@ from AA_dependencies import sleep
 from AA_dependencies import threading
 from AA_dependencies import AB_logging
 from AA_dependencies import AC_signals
-from AA_dependencies import AE_IO
 from AA_dependencies import AD_decorators
+from AA_dependencies import AE_IO
 
 
 @AD_decorators.threadLogger
@@ -34,7 +34,7 @@ def terminateFromFile(outFile: Path, terminatoryWords: typing.Tuple[str,...], wa
 							break
 
 						if killPhrase.encode() in line:
-							AB_logging.logging.info(f"terminateFromFile for {outFile}: killPhrase detected: {killPhrase}: {line}, shutting down!")
+							AB_logging.logging.info(f"terminateFromFile for {outFile}: killPhrase detected: {killPhrase}: {line.strip()}, shutting down!")
 							terminated = True
 							sleep(waitTillTermination)
 							constants.stop_flag.set()
@@ -66,12 +66,12 @@ def terminateFromPIPE(pipe: typing.IO, terminatoryWords: typing.Tuple[str,...], 
 					break
  
 				if killPhrase in line:
-					AB_logging.logging.info(f"terminateFromPIPE for {pipe}: killPhrase detected: {killPhrase}: {line}, shutting down")
+					AB_logging.logging.info(f"terminateFromPIPE for {pipe}: killPhrase detected: {killPhrase}: {line.strip()}, shutting down")
 					terminated = True
 					sleep(waitTillTermination)
 					constants.stop_flag.set()
 					break
-			sleep(0.1)
+			sleep(0.01)
 
 		else:
 			AB_logging.logging.info(f"terminateFromPIPE for {pipe}: line is None - EOF, shutting down!")
@@ -94,6 +94,7 @@ def terminateTimeout(timeoutSeconds: float, waitTillTermination: typing.Optional
 	AB_logging.logging.info(f"terminateTimeout: {timeoutSeconds} seconds passed, shutting down!")
 	sleep(waitTillTermination)
 	constants.stop_flag.set()
+
 
 #Terminating the program in {waitTillTermination} s!
 

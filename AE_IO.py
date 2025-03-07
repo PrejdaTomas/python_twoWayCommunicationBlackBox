@@ -3,7 +3,6 @@ from AA_dependencies import sleep
 #from AA_dependencies import watchdogEvents
 #from AA_dependencies import watchdogObservers
 from AA_dependencies import constants
-from AA_dependencies import AD_decorators
 
 def moveCursorToTheEnd(readPortInput: typing.IO) -> None:
 	readPortInput.seek(	0,				#offset = pocet bajtu pro posun kurzoru (stride)
@@ -59,7 +58,8 @@ def readLastNBytes(readPortInput:  typing.IO, bufferSize: typing.Optional[int] =
 # 		observer.stop()
 # 		observer.join()
 
-@AD_decorators.checkTypesAtCorrespondingIndices(inputTypes=(Path,), argumentPositions=(0,))
+from AD_decorators import checkTypesAtCorrespondingIndices
+@checkTypesAtCorrespondingIndices(inputTypes=(Path,), argumentPositions=(0,))
 def waitTillFileExists_stupid(filePath: Path) -> None:
 	while not os.path.exists(filePath):
 		sleep(0.1)

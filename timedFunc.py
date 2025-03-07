@@ -5,7 +5,8 @@ from AA_dependencies import subprocess, threading, psutil
 from AA_dependencies import constants
 from AA_dependencies import pidPrint
 from AA_dependencies import Path
-from AC_decorators import checkTypesAtCorrespondingIndices
+from AA_dependencies import AB_logging
+from AD_decorators import checkTypesAtCorrespondingIndices
 
 @checkTypesAtCorrespondingIndices(inputTypes=(Path,), argumentPositions=(1,))
 def runWithTimeout(command: typing.Union[typing.List[str], str],
@@ -58,21 +59,21 @@ def runWithTimeout(command: typing.Union[typing.List[str], str],
  
 	def _findPID_childProcess(PID_parentProcess: int) -> typing.Union[None, int]:
 		if proc.poll() is not None:
-			if constants.verbose: pidPrint(f"runWithTimeout: The parent is already dead: proc")
+			if constants.verbose: AB_logging.logging.info(f"runWithTimeout: The parent is already dead: proc")
 			return None
 
 		parent = psutil.Process(pid=PID_parentProcess)
 		if parent.is_running() is False:
-			if constants.verbose: pidPrint(f"runWithTimeout: The parent is already dead: proc")
+			if constants.verbose: AB_logging.logging.info(f"runWithTimeout: The parent is already dead: proc")
 			return None
 
 		children = parent.children(recursive=True)
 		for child in children:
 			if child.name() == executableName and parent.is_running() and proc.poll() is not None:
-				if constants.verbose: pidPrint(f"runWithTimeout: Found parent for child {child.pid}: {child.name()} -> {parent.pid}: {parent.name()}")
+				if constants.verbose: AB_logging.logging.info(f"runWithTimeout: Found parent for child {child.pid}: {child.name()} -> {parent.pid}: {parent.name()}")
 				return child.pid
 			else:
-				if constants.verbose: pidPrint(f"runWithTimeout: The parent is already dead: proc")
+				if constants.verbose: AB_logging.logging.info(f"runWithTimeout: The parent is already dead: proc")
 
 		return None
 
@@ -83,7 +84,7 @@ def runWithTimeout(command: typing.Union[typing.List[str], str],
 		child_pid = _findPID_childProcess(PID_parentProcess=proc.pid)
 		if child_pid is not None:
 			child_proc = psutil.Process(pid=child_pid)
-			if constants.verbose: pidPrint(f"runWithTimeout: Terminating the child_proc: {child_pid}:{child_proc.name()}")
+			if constants.verbose: AB_logging.logging.info(f"runWithTimeout: Terminating the child_proc: {child_pid}:{child_proc.name()}")
 			child_proc.kill()
 		proc.kill()
 
@@ -108,11 +109,11 @@ def runWithTimeout(command: typing.Union[typing.List[str], str],
 						readPort.seek(max(file_size - 1024, 0), os.SEEK_SET)  # Read the last 1KB of the file
 						lines = readPort.readlines()[20:]
 						if any(binaryWord in line for binaryWord in binaryKeywords for line in lines):
-							if constants.verbose: pidPrint(f"runWithTimeout: terminatory word found")
+							if constants.verbose: AB_logging.logging.info(f"runWithTimeout: terminatory word found")
 							_executeOnTimeout()
 							break
 						if _findPID_childProcess(PID_parentProcess=proc.pid) is None:
-							if constants.verbose: pidPrint(f"runWithTimeout: parent process is dead")
+							if constants.verbose: AB_logging.logging.info(f"runWithTimeout: parent process is dead")
 							_executeOnTimeout()
 							break
 
@@ -142,12 +143,12 @@ def runWithTimeout(command: typing.Union[typing.List[str], str],
 		try:
 			timer.start()
 			if monitorThread:
-				if constants.verbose: pidPrint(f"runWithTimeout: starting a monitor")
+				if constants.verbose: AB_logging.logging.info(f"runWithTimeout: starting a monitor")
 				monitorThread.start()
 			returnCode = proc.wait()
 		finally:
 			timer.cancel()
-			if constants.verbose: pidPrint(f"runWithTimeout: stopped the timer")
+			if constants.verbose: AB_logging.logging.info(f"runWithTimeout: stopped the timer")
 
 			if timeout_event.is_set() and afterCompletionFunc is not None:
 				returnValFunctionAfter = afterCompletionFunc()
@@ -156,6 +157,6 @@ def runWithTimeout(command: typing.Union[typing.List[str], str],
 			if monitorThread: monitorThread.join()
 
 		return returnCode
-	if constants.verbose: pidPrint(f"runWithTimeout: succesfully terminated")
+	if constants.verbose: AB_logging.logging.info(f"runWithTimeout: succesfully terminated")
 	return _timedFunc()
 
